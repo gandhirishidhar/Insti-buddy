@@ -1,0 +1,6 @@
+.venv/
+.env
+insti_buddy_db/
+campus_docs/
+__pycache__/
+*.pyc
