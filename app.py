@@ -10,7 +10,22 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 load_dotenv()
 
+# On Streamlit Community Cloud there is no .env file -- secrets are entered
+# in the app's dashboard and read via st.secrets. Copy them into the normal
+# environment so the rest of this file (and ingest.py) doesn't need to care
+# whether it's running locally or in the cloud.
+for _key in ("GOOGLE_API_KEY", "GEMINI_MODEL", "DOCS_FOLDER"):
+    if _key in st.secrets:
+        os.environ[_key] = str(st.secrets[_key])
+
 DB_FOLDER = "insti_buddy_db"
+
+# First visitor to a fresh deployment triggers ingestion since the database
+# folder is not committed to git (ingest.py reads DOCS_FOLDER itself).
+if not Path(DB_FOLDER).exists():
+    with st.spinner("Setting up the knowledge base for the first time (this can take a minute)..."):
+        import ingest
+        ingest.main()
 EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"   # MUST match ingest.py
 TOP_K = 3
 

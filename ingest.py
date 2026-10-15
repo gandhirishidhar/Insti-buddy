@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from pypdf import PdfReader
 from langchain_core.documents import Document
@@ -5,7 +6,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 
-DOCS_FOLDER = "campus_docs"
+DOCS_FOLDER = os.getenv("DOCS_FOLDER", "campus_docs")  # "public_docs" on the deployed demo
 EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 DB_FOLDER = "insti_buddy_db"
 
@@ -37,7 +38,7 @@ def store_in_database(chunks, embeddings):
     )
 
 
-if __name__ == "__main__":
+def main():
     documents = load_pdfs(DOCS_FOLDER)
     print(f"Loaded {len(documents)} pages")
 
@@ -47,3 +48,7 @@ if __name__ == "__main__":
     embeddings = create_embeddings()
     store_in_database(chunks, embeddings)
     print(f"Saved {len(chunks)} chunks to '{DB_FOLDER}'. Done!")
+
+
+if __name__ == "__main__":
+    main()
